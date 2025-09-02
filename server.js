@@ -7,7 +7,11 @@
  *************************/
 const express = require("express")
 const env = require("dotenv").config()
-const app = express()
+const path = require("path");
+
+const app = express();
+
+;
 const static = require("./routes/static")
 const expressLayouts = require("express-ejs-layouts")
 
@@ -17,10 +21,12 @@ const expressLayouts = require("express-ejs-layouts")
 app.use(static)
 app.set("view engine", "ejs")
 app.use(expressLayouts)
-app.set("layout", "./layouts/layout") // not at views root
+app.set("layout", "./layouts/layout")
 app.get("/", function (req, res) {
   res.render("index", { title: "Home" })
 })
+// serve /public (so /images/... and /css/... work)
+app.use(express.static(path.join(__dirname, "public")))
 /* ***********************
  * Local Server Information
  * Values from .env (environment) file

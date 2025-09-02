@@ -1,6 +1,246 @@
-/******* Change Box Model ***************/
+/* Box model + base */
 *,
-*:before,
-*:after {
+*::before,
+*::after {
   box-sizing: border-box;
+}
+
+body,
+h1,
+h2,
+h3,
+p,
+ul,
+li {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: url("/images/site/checkerboard.jpg");
+  color: #111;
+}
+
+/* Page frame */
+.page {
+  background: #fff;
+  border: 8px solid #22c7d8;
+  max-width: 900px;
+  margin: 20px auto;
+}
+
+main {
+  padding: 0 16px 16px;
+}
+
+/* Header */
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+}
+
+.logo {
+  font-weight: 800;
+  font-size: 26px;
+}
+
+.account a {
+  color: #6b6f7a;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+/* Nav */
+.site-nav {
+  background: #1f2232;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.site-nav ul {
+  list-style: none;
+  display: flex;
+  gap: 10px;
+  padding: 10px 16px;
+}
+
+.site-nav a {
+  color: #fff;
+  text-decoration: none;
+  background: #30364f;
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: block;
+}
+
+.site-nav a[aria-current="page"] {
+  background: #151a2b;
+  font-weight: bold;
+}
+
+/* Hero */
+.hero {
+  padding: 16px 16px 8px;
+}
+
+.hero h1 {
+  margin: 0 0 10px;
+  font-size: 24px;
+}
+
+.hero-stage {
+  position: relative;
+  max-width: 720px;
+}
+
+.hero-stage img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.hero-panel {
+  position: absolute;
+  left: 16px;
+  top: 24px;
+  background: #9edff0;
+  padding: 12px;
+  border-radius: 8px;
+  max-width: 260px;
+}
+
+.hero-panel h2 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+
+.hero-panel ul {
+  margin: 0 0 10px 18px;
+  padding: 0;
+}
+
+.hero-panel li {
+  list-style: none;
+}
+
+.btn {
+  display: inline-block;
+  background: #0a58ca;
+  color: #fff;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+/* Main columns */
+.main-cols {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 10px 16px 16px;
+}
+
+.main-cols h2 {
+  margin: 0 0 8px;
+}
+
+/* Reviews */
+.reviews {
+  margin-left: 18px;
+}
+
+.reviews li {
+  margin: 8px 0;
+}
+
+/* Upgrades */
+.upgrades {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.upgrades li {
+  flex: 1 1 calc(50% - 12px);
+  display: flex;
+}
+
+.upgrades a {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #19c6d5;
+  border: 2px solid #7fd3de;
+  border-radius: 8px;
+  text-align: center;
+  text-decoration: none;
+  color: #004a57;
+  padding: 8px;
+}
+
+.upgrades img {
+  max-height: 100px;
+  object-fit: contain;
+  width: 100%;
+  height: auto;
+  margin: 0 auto 8px;
+}
+
+.upgrades span {
+  display: block;
+  background: #e9faff;
+  border-top: 1px solid #c3eaf2;
+  padding: 6px 4px;
+  text-decoration: underline;
+}
+
+/* Footer */
+.site-footer {
+  border-top: 1px solid #ddd;
+  padding: 12px 16px;
+  color: #666;
+  font-size: 14px;
+}
+
+/* Desktop adjustments */
+@media (min-width: 768px) {
+  .main-cols {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .col-reviews {
+    order: 2;
+  }
+
+  .col-upgrades {
+    order: 1;
+  }
+
+  .col-reviews,
+  .col-upgrades {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .reviews {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+  }
+
+  .hero-panel {
+    left: 20px;
+    top: 30px;
+  }
 }

@@ -8,6 +8,7 @@
 const express = require("express")
 const env = require("dotenv").config()
 const path = require("path");
+const { connectToDb, getDb } = require('./controllers/conn.js');
 
 const app = express();
 
@@ -18,6 +19,12 @@ const expressLayouts = require("express-ejs-layouts")
 /* ***********************
  * Routes
  *************************/
+
+const swaggerUi = require('swagger-ui-express');
+const openapi = require('./swagger/swaggerapi.json');
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapi));
+
 app.use(static)
 app.set("view engine", "ejs")
 app.use(expressLayouts)

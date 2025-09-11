@@ -1,0 +1,179 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Static Assets Server",
+        "description": "API documentation for static file routes (public, css, js, images).",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8080",
+            "description": "Local"
+        }
+    ],
+    "paths": {
+        "/": {
+            "get": {
+                "summary": "Root",
+                "description": "Serves the homepage or a simple greeting (e.g., 'Hello World').",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/html": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/css/{file}": {
+            "get": {
+                "summary": "Serve CSS file",
+                "parameters": [
+                    {
+                        "name": "file",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "styles.css"
+                        },
+                        "description": "CSS filename within /public/css"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "CSS file",
+                        "content": {
+                            "text/css": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/js/{file}": {
+            "get": {
+                "summary": "Serve JS file",
+                "parameters": [
+                    {
+                        "name": "file",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "app.js"
+                        },
+                        "description": "JS filename within /public/js"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "JavaScript file",
+                        "content": {
+                            "application/javascript": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/images/{file}": {
+            "get": {
+                "summary": "Serve image file",
+                "parameters": [
+                    {
+                        "name": "file",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "logo.png"
+                        },
+                        "description": "Image filename within /public/images"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Image file",
+                        "content": {
+                            "image/*": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/public/{path}": {
+            "get": {
+                "summary": "Serve file from /public",
+                "description": "Generic static file handler for anything under /public.",
+                "parameters": [
+                    {
+                        "name": "path",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "docs/readme.txt"
+                        },
+                        "description": "Relative path within /public"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "File",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        }
+    },
+    "components": {},
+    "tags": [
+        {
+            "name": "Static",
+            "description": "Static asset routes"
+        }
+    ]
+}

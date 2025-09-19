@@ -1,64 +1,101 @@
 const invModel = require("../models/inventory-model")
+
 const Util = {}
 
-/* ************************
- * Constructs the nav HTML unordered list
- ************************** */
-Util.getNav = async function (req, res, next) {
-    let data = await invModel.getClassifications()
-    let list = "<ul>"
-    list += '<li><a href="/" title="Home page">Home</a></li>'
+
+Util.getNav = async function () {
+    const data = await invModel.getClassifications()
+    let html = '<nav class="site-nav" aria-label="Primary"><ul>'
+    html += '<li><a href="/" title="Home page">Home</a></li>'
     data.rows.forEach((row) => {
-        list += "<li>"
-        list +=
-            '<a href="/inv/type/' +
-            row.classification_id +
-            '" title="See our inventory of ' +
-            row.classification_name +
-            ' vehicles">' +
-            row.classification_name +
-            "</a>"
-        list += "</li>"
+        html += `
+        <li>
+          <a href="/inv/type/${row.classification_id}"
+             title="See our inventory of ${row.classification_name} vehicles">
+            ${row.classification_name}
+          </a>
+        </li>`
     })
-    list += "</ul>"
-    return list
+    html += "</ul></nav>"
+    return html
 }
 
 
-/* **************************************
-* Build the classification view HTML
-* ************************************ */
+Util.fmtUSD = (n) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" })
+        .format(Number(n))
+
+Util.fmtInt = (n) =>
+    new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 })
+        .format(Number(n))
+
+
 Util.buildClassificationGrid = async function (data) {
-    let grid
-    if (data.length > 0) {
-        grid = '<ul id="inv-display">'
-        data.forEach(vehicle => {
-            grid += '<li>'
-            grid += '<a href="../../inv/detail/' + vehicle.inv_id
-                + '" title="View ' + vehicle.inv_make + ' ' + vehicle.inv_model
-                + 'details"><img src="' + vehicle.inv_thumbnail
-                + '" alt="Image of ' + vehicle.inv_make + ' ' + vehicle.inv_model
-                + ' on CSE Motors" /></a>'
-            grid += '<div class="namePrice">'
-            grid += '<hr />'
-            grid += '<h2>'
-            grid += '<a href="../../inv/detail/' + vehicle.inv_id + '" title="View '
-                + vehicle.inv_make + ' ' + vehicle.inv_model + ' details">'
-                + vehicle.inv_make + ' ' + vehicle.inv_model + '</a>'
-            grid += '</h2>'
-            grid += '<span>$'
-                + new Intl.NumberFormat('en-US').format(vehicle.inv_price) + '</span>'
-            grid += '</div>'
-            grid += '</li>'
+    let grid = "" // FIX: ensure it's initialized
+
+    if (data && data.length > 0) {
+        grid = '<ul id="inv-display" class="inv-grid" role="list">'
+        data.forEach((vehicle) => {
+            const price = Util.fmtUSD(vehicle.inv_price)
+            const title = `${vehicle.inv_make} ${vehicle.inv_model}`
+            const thumb = vehicle.inv_thumbnail || "/images/placeholder_car.jpg"
+            grid += `
+        <li class="inv-card">
+          <a href="/inv/detail/${vehicle.inv_id}"
+             title="View ${title} details">
+            <img src="${thumb}"
+                 alt="Image of ${title} on CSE Motors"
+                 loading="lazy" />
+          </a>
+          <div class="namePrice">
+            <hr />
+            <h2>
+              <a href="/inv/detail/${vehicle.inv_id}" title="View ${title} details">
+                ${title}
+              </a>
+            </h2>
+            <span class="price">${price}</span>
+          </div>
+        </li>
+      `
         })
-        grid += '</ul>'
+        grid += "</ul>"
     } else {
-        grid += '<p class="notice">Sorry, no matching vehicles could be found.</p>'
+        grid = '<p class="notice">Sorry, no matching vehicles could be found.</p>'
     }
     return grid
 }
 
-Util.handleErrors = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)
+Util.buildVehicleDetailHTML = function (v) {
+    const title = `${v.inv_make} ${v.inv_model} (${v.inv_year})`
+    const img = v.inv_image || v.inv_thumbnail || "/images/placeholder_car.jpg"
+    const price = Util.fmtUSD(v.inv_price)
+    const miles = Util.fmtInt(v.inv_miles)
 
+    return `
+    <section class="vehicle-detail" aria-labelledby="veh-title">
+      <div class="veh-media">
+        <img src="${img}" alt="${title}" loading="eager" width="900" height="600" />
+      </div>
+      <div class="veh-info">
+        <h1 id="veh-title" class="veh-title">${title}</h1>
+        <div class="veh-meta">
+          <p><strong>Make:</strong> ${v.inv_make}</p>
+          <p><strong>Model:</strong> ${v.inv_model}</p>
+          <p><strong>Year:</strong> ${v.inv_year}</p>
+          <p><strong>Price:</strong> <span class="veh-price">${price}</span></p>
+          <p><strong>Mileage:</strong> <span class="veh-miles">${miles}</span> miles</p>
+        </div>
+        <div class="veh-desc">
+          <h2>Description</h2>
+          <p>${v.inv_description ?? "No description available."}</p>
+        </div>
+      </div>
+    </section>
+  `
+}
+
+Util.handleErrors = (fn) => (req, res, next) =>
+    Promise.resolve(fn(req, res, next)).catch(next)
 
 module.exports = Util

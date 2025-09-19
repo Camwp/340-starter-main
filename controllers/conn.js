@@ -1,4 +1,3 @@
-// db/conn.js
 import pkg from 'pg';
 const { Pool } = pkg;
 
@@ -8,7 +7,7 @@ export async function connectToDb() {
     if (process.env.PG_URI) {
         pool = new Pool({
             connectionString: process.env.PG_URI,
-            ssl: { rejectUnauthorized: false }, // Render requires SSL
+            ssl: { rejectUnauthorized: false },
         });
     } else {
         pool = new Pool({
@@ -22,7 +21,7 @@ export async function connectToDb() {
     }
 
     try {
-        await pool.query('SELECT NOW()'); // test connection
+        await pool.query('SELECT NOW()');
         console.log('✅ Connected to Postgres');
     } catch (err) {
         console.error('❌ Failed to connect to Postgres:', err);

@@ -19,6 +19,7 @@ const openapi = require("./swagger/swaggerapi.json")
 /* Sessions + Flash */
 const session = require("express-session")
 const flash = require("connect-flash")
+const expressMessages = require("express-messages")
 
 const pool = require("./database")
 const PgSession = require("connect-pg-simple")(session)
@@ -53,7 +54,7 @@ app.use(flash())
 
 
 app.use((req, res, next) => {
-  res.locals.notice = req.flash("notice")
+  res.locals.messages = expressMessages(req, res)
   next()
 })
 

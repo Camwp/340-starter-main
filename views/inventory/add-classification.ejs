@@ -1,0 +1,25 @@
+<section class="container">
+    <h1>Add New Classification</h1>
+
+    <% if (errors && errors.length) { %>
+        <ul class="errors">
+            <% errors.forEach(e=> { %><li>
+                    <%= e.msg %>
+                </li>
+                <% }) %>
+        </ul>
+        <% } %>
+
+            <form action="/inv/add-classification" method="post" novalidate>
+                <p><small>Letters only, no spaces or special characters.</small></p>
+
+                <label for="classification_name">Classification Name</label>
+                <input type="text" id="classification_name" name="classification_name" required pattern="^[A-Za-z]+$"
+                    title="Letters only, no spaces or special characters." minlength="3" maxlength="20"
+                    value="<%= typeof classification_name !== 'undefined' ? classification_name : '' %>" />
+
+                <div style="margin-top:.75rem">
+                    <button class="btn btn-primary" type="submit">Add Classification</button>
+                </div>
+            </form>
+</section>

@@ -244,3 +244,28 @@ main {
     top: 30px;
   }
 }
+
+.errors {
+  margin: .5rem 0 1rem;
+  color: #b00020;
+}
+
+.errors li {
+  margin-left: 1rem;
+}
+
+.notice {
+  margin: .5rem 0 1rem;
+  background: #ecfdf5;
+  color: #065f46;
+  padding: .5rem .75rem;
+  border-radius: .5rem;
+}
+
+.mgmt-links {
+  list-style: none;
+  display: flex;
+  gap: .5rem;
+  padding: 0;
+  margin: .75rem 0 0;
+}

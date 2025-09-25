@@ -31,7 +31,7 @@ Util.fmtInt = (n) =>
 
 
 Util.buildClassificationGrid = async function (data) {
-    let grid = "" // FIX: ensure it's initialized
+    let grid = ""
 
     if (data && data.length > 0) {
         grid = '<ul id="inv-display" class="inv-grid" role="list">'

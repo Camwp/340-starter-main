@@ -66,6 +66,28 @@ Util.buildClassificationGrid = async function (data) {
     return grid
 }
 
+
+Util.buildClassificationList = async function (classification_id = null) {
+    const data = await invModel.getClassifications() // returns { rows: [...] }
+    let classificationList =
+        '<select name="classification_id" id="classificationList" required>'
+    classificationList += "<option value=''>Choose a Classification</option>"
+
+    data.rows.forEach((row) => {
+        const selected =
+            classification_id != null &&
+                Number(row.classification_id) === Number(classification_id)
+                ? " selected"
+                : ""
+        classificationList += `<option value="${row.classification_id}"${selected}>${row.classification_name}</option>`
+    })
+
+    classificationList += "</select>"
+    return classificationList
+}
+
+Util.handleErrors = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)
+
 Util.buildVehicleDetailHTML = function (v) {
     const title = `${v.inv_make} ${v.inv_model} (${v.inv_year})`
     const img = v.inv_image || v.inv_thumbnail || "/images/placeholder_car.jpg"
@@ -94,6 +116,7 @@ Util.buildVehicleDetailHTML = function (v) {
     </section>
   `
 }
+
 
 Util.handleErrors = (fn) => (req, res, next) =>
     Promise.resolve(fn(req, res, next)).catch(next)

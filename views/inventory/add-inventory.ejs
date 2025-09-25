@@ -1,0 +1,48 @@
+<section class="container">
+    <h1>Add New Vehicle</h1>
+
+    <% if (errors && errors.length) { %>
+        <ul class="errors">
+            <% errors.forEach(e=> { %><li>
+                    <%= e.msg %>
+                </li>
+                <% }) %>
+        </ul>
+        <% } %>
+
+            <form action="/inv/add-inventory" method="post" novalidate>
+                <label for="inv_make">Make</label>
+                <input type="text" id="inv_make" name="inv_make" required value="<%= invData?.inv_make || '' %>" />
+
+                <label for="inv_model">Model</label>
+                <input type="text" id="inv_model" name="inv_model" required value="<%= invData?.inv_model || '' %>" />
+
+                <label for="inv_year">Year</label>
+                <input type="number" id="inv_year" name="inv_year" min="1900" max="2099" required
+                    value="<%= invData?.inv_year || '' %>" />
+
+                <label for="inv_price">Price (USD)</label>
+                <input type="number" id="inv_price" name="inv_price" min="0" step="0.01" required
+                    value="<%= invData?.inv_price || '' %>" />
+
+                <label for="inv_miles">Mileage</label>
+                <input type="number" id="inv_miles" name="inv_miles" min="0" step="1" required
+                    value="<%= invData?.inv_miles || '' %>" />
+
+                <label for="inv_image">Full Image Path</label>
+                <input type="text" id="inv_image" name="inv_image" required placeholder="/images/vehicles/no-image.png"
+                    value="<%= invData?.inv_image || '/images/vehicles/no-image.png' %>" />
+
+                <label for="inv_thumbnail">Thumbnail Path</label>
+                <input type="text" id="inv_thumbnail" name="inv_thumbnail" required
+                    placeholder="/images/vehicles/no-image-tn.png"
+                    value="<%= invData?.inv_thumbnail || '/images/vehicles/no-image-tn.png' %>" />
+
+                <label for="classificationList">Classification</label>
+                <%- classificationList %>
+
+                    <div style="margin-top:1rem">
+                        <button class="btn btn-primary" type="submit">Add Vehicle</button>
+                    </div>
+            </form>
+</section>

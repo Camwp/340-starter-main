@@ -7,13 +7,37 @@ const baseController = require("./controllers/baseController")
 const inventoryRoute = require("./routes/inventoryRoute")
 const staticRoutes = require("./routes/static")
 const utilities = require("./utilities")
-
+const session = require("express-session")
+const pool = require('./database/')
 /* Swagger */
 const swaggerUi = require("swagger-ui-express")
 const openapi = require("./swagger/swaggerapi.json")
 
 /* App */
 const app = express()
+
+
+
+
+
+/* ***********************
+ * Middleware
+ * ************************/
+app.use(session({
+  store: new (require('connect-pg-simple')(session))({
+    createTableIfMissing: true,
+    pool,
+  }),
+  secret: process.env.SESSION_SECRET,
+  resave: true,
+  saveUninitialized: true,
+  name: 'sessionId',
+}))
+
+
+
+
+
 
 /* View Engine & Layouts */
 app.set("view engine", "ejs")

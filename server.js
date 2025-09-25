@@ -9,6 +9,9 @@ const staticRoutes = require("./routes/static")
 const utilities = require("./utilities")
 const session = require("express-session")
 const pool = require('./database/')
+const accountRoute = require("./routes/accountRoute");
+const bodyParser = require("body-parser");
+
 /* Swagger */
 const swaggerUi = require("swagger-ui-express")
 const openapi = require("./swagger/swaggerapi.json")
@@ -34,9 +37,17 @@ app.use(session({
   name: 'sessionId',
 }))
 
+// Express Messages Middleware
+app.use(require('connect-flash')())
+app.use(function (req, res, next) {
+  res.locals.messages = require('express-messages')(req, res)
+  next()
+})
 
 
-
+// Middleware (near other app.use calls)
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 
 /* View Engine & Layouts */
@@ -45,9 +56,6 @@ app.set("views", path.join(__dirname, "views"))
 app.use(expressLayouts)
 app.set("layout", "./layouts/layout")
 
-/* Parsers */
-app.use(express.urlencoded({ extended: true }))
-app.use(express.json())
 
 /* Static assets */
 app.use(express.static(path.join(__dirname, "public")))
@@ -61,6 +69,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openapi))
 /* Routes */
 app.get("/", utilities.handleErrors(baseController.buildHome))
 app.use("/inv", inventoryRoute)
+app.use("/account", accountRoute);
 
 
 

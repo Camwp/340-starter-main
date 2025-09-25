@@ -1,0 +1,165 @@
+<style>
+    :root {
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    }
+
+
+    main {
+        max-width: 560px;
+        margin: 4rem auto;
+        padding: 2rem;
+        border: 1px solid #232848;
+        border-radius: 16px;
+    }
+
+    h1 {
+        margin-top: 0;
+    }
+
+    .notice {
+        border: 1px solid #2c3566;
+        padding: .75rem 1rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+    }
+
+    form {
+        display: grid;
+        gap: .75rem;
+    }
+
+    label {
+        font-weight: 600;
+    }
+
+    input {
+        width: 100%;
+        padding: .7rem .8rem;
+        border-radius: 10px;
+        border: 1px solid #2b3156;
+    }
+
+    button {
+        padding: .7rem 1rem;
+        border: 0;
+        border-radius: 10px;
+        background: #2d6cdf;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    button:hover {
+        filter: brightness(1.05);
+    }
+
+    .muted {
+        opacity: .75;
+        font-size: .95rem;
+        margin-top: .5rem;
+    }
+
+
+    .row-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .75rem;
+    }
+
+    @media (max-width: 640px) {
+        .row-2 {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    input:required:invalid,
+    input:focus:invalid {
+        outline: 2px solid #d9534f;
+    }
+
+    input:required:valid {
+        outline: 2px solid #5cb85c;
+    }
+</style>
+
+
+<body>
+
+    <main>
+        <%- messages() %>
+            <% if (errors) { %>
+                <ul class="notice">
+                    <% errors.array().forEach(error=> { %>
+                        <li>
+                            <%= error.msg %>
+                        </li>
+                        <% }) %>
+                </ul>
+                <% } %>
+
+                    <h1>
+                        <%= title %>
+                    </h1>
+
+                    <form method="post" action="/account/register">
+                        <div class="row-2">
+                            <div>
+                                <label for="account_firstname">First name</label>
+                                <input id="account_firstname" name="account_firstname" type="text" required
+                                    value="<%= typeof account_firstname !== 'undefined' ? account_firstname : '' %>" />
+                            </div>
+                            <div>
+                                <label for="account_lastname">Last name</label>
+                                <input id="account_lastname" name="account_lastname" type="text" required
+                                    value="<%= typeof account_lastname !== 'undefined' ? account_lastname : '' %>" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="account_email">Email</label>
+                            <input id="account_email" name="account_email" type="email" required
+                                value="<%= typeof account_email !== 'undefined' ? account_email : '' %>" />
+                        </div>
+
+                        <div>
+                            <label for="account_password">Password</label>
+                            <input id="account_password" name="account_password" type="password" required
+                                autocomplete="new-password" aria-describedby="pw-help"
+                                pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$" />
+                            <div id="pw-help" class="muted">
+                                Passwords must be at least 12 characters and contain at least 1 number, 1 capital
+                                letter, and 1
+                                special character.
+                            </div>
+
+                        </div>
+
+                        <button type="button" id="togglePw" aria-controls="account_password" aria-pressed="false">Show
+                            password</button>
+
+                        </div>
+                        <button type="submit">Create account</button>
+
+                    </form>
+
+                    <p class="muted" style="margin-top:1rem">
+                        Already have an account? <a href="/account/login">Sign in</a>.
+                    </p>
+    </main>
+
+    <script>
+        (function () {
+            const btn = document.getElementById('togglePw');
+            const input = document.getElementById('account_password');
+            if (btn && input) {
+                btn.addEventListener('click', () => {
+                    const showing = input.type === 'text';
+                    input.type = showing ? 'password' : 'text';
+                    btn.textContent = showing ? 'Show password' : 'Hide password';
+                    btn.setAttribute('aria-pressed', String(!showing));
+                });
+            }
+        })();
+    </script>
+</body>
+
+</html>

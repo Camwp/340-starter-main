@@ -3,6 +3,7 @@ const router = new express.Router()
 const invController = require("../controllers/invController")
 const validate = require("../validations/inventory-validation")
 
+
 // Management
 router.get("/", invController.buildManagement)
 
@@ -29,5 +30,12 @@ router.post(
     validate.checkInvData,
     invController.addInventory
 )
+
+router.get("/type/:classificationId", invController.buildByClassificationId)
+router.get("/detail/:invId", invController.buildVehicleDetail)
+router.get("/type/:classificationId", invController.buildByClassificationId)
+router.get("/detail/:invId", invController.buildVehicleDetail)
+
+
 
 module.exports = router

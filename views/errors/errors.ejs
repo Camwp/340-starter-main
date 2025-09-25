@@ -1,9 +1,21 @@
-<% if (title) { %>
-    <h1>
-        <%= title %>
+<section class="container error-view" aria-labelledby="err-title">
+    <h1 id="err-title" class="err-heading">
+        <%= title || 'Error' %>
     </h1>
-    <% } else { res.redirect('/') } %>
+    <p class="err-message">
+        <%= message %>
+    </p>
 
-        <body>
-            <%= message %>
-        </body>
+    <% if (status===404) { %>
+        <p>Try returning to the <a href="/">home page</a> or use the navigation above.</p>
+        <% } else if (status>= 500) { %>
+            <p>Something went wrong on our side. Please try again later.</p>
+            <% } %>
+
+                <% if (process.env.NODE_ENV !=='production' && err && err.stack) { %>
+                    <details class="err-details">
+                        <summary>Error details (development)</summary>
+                        <pre><%= err.stack %></pre>
+                    </details>
+                    <% } %>
+</section>

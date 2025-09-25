@@ -53,7 +53,7 @@ main {
   font-size: 14px;
 }
 
-/* Nav */
+/* Base nav */
 .site-nav {
   background: #1f2232;
   position: sticky;
@@ -66,6 +66,7 @@ main {
   display: flex;
   gap: 10px;
   padding: 10px 16px;
+  margin: 0;
 }
 
 .site-nav a {
@@ -80,6 +81,54 @@ main {
 .site-nav a[aria-current="page"] {
   background: #151a2b;
   font-weight: bold;
+}
+
+@media (max-width: 480px) {
+  .site-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .logo {
+    font-size: 22px;
+  }
+
+  .page {
+    border-width: 6px;
+    margin: 12px;
+  }
+
+  .site-nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .site-nav ul {
+    flex-wrap: nowrap;
+    gap: 8px;
+    min-width: max-content;
+  }
+
+  .site-nav a {
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+
+  .site-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+}
+
+@media (min-width: 481px) and (max-width: 767px) {
+  .site-nav ul {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
+  .site-nav a {
+    padding: 8px 11px;
+  }
 }
 
 /* Hero */
@@ -245,6 +294,7 @@ main {
   }
 }
 
+
 .errors {
   margin: .5rem 0 1rem;
   color: #b00020;
@@ -269,3 +319,159 @@ main {
   padding: 0;
   margin: .75rem 0 0;
 }
+=======
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.vehicle-detail {
+  display: grid;
+  gap: 1.25rem;
+  margin: 0.5rem 0 1.5rem;
+}
+
+.veh-media img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 10px;
+}
+
+.veh-info {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.veh-title {
+  font-size: clamp(1.6rem, 2vw + 1rem, 2.4rem);
+  line-height: 1.2;
+  margin: 0.25rem 0 0.25rem;
+}
+
+.veh-price-card {
+  border: 1px solid rgba(0, 0, 0, .08);
+  background: rgba(15, 23, 42, .03);
+  border-radius: 12px;
+  padding: .75rem 1rem;
+}
+
+.veh-price-amount {
+  font-weight: 800;
+  font-size: clamp(1.4rem, 1.6vw + 1rem, 2rem);
+}
+
+.veh-mileage {
+  margin-top: .25rem;
+}
+
+.veh-meta {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: .5rem 1rem;
+  margin: .75rem 0 0.5rem;
+}
+
+.veh-meta dt {
+  font-weight: 600;
+}
+
+.veh-meta dd {
+  margin: 0;
+}
+
+/* description */
+.veh-desc h2 {
+  margin-top: 1rem;
+  font-size: 1.25rem;
+}
+
+.veh-desc p {
+  margin: .25rem 0 0;
+}
+
+.veh-ctas {
+  display: grid;
+  gap: .5rem;
+  margin-top: 1rem;
+  max-width: 360px;
+}
+
+.btn {
+  display: inline-block;
+  text-align: center;
+  padding: .65rem .95rem;
+  border-radius: .6rem;
+  border: 1px solid rgba(0, 0, 0, .12);
+  background: #f5f6f8;
+  text-decoration: none;
+  color: inherit;
+}
+
+.btn:hover {
+  filter: brightness(0.98);
+}
+
+.btn-primary {
+  background: #0f172a;
+  color: #fff;
+  border-color: #0f172a;
+}
+
+#inv-display.inv-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  padding: 0;
+  list-style: none;
+}
+
+.inv-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+}
+
+.namePrice h2 {
+  font-size: 1.05rem;
+  margin: .25rem 0;
+}
+
+.namePrice .price,
+.veh-price-amount {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 900px) {
+  .vehicle-detail {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
+    align-items: start;
+  }
+
+  .veh-ctas {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .veh-meta {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.error-view,
+.vehicle-detail,
+#inv-display.inv-grid {}
+

@@ -319,7 +319,7 @@ main {
   padding: 0;
   margin: .75rem 0 0;
 }
-=======
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -474,4 +474,3 @@ main {
 .error-view,
 .vehicle-detail,
 #inv-display.inv-grid {}
-

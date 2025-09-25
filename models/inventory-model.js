@@ -76,7 +76,7 @@ module.exports = {
 
     getInventoryById,   // ensure this is exported
     addClassification,
-    addInventory
+    addInventory,
 
     getInventoryById,
 }

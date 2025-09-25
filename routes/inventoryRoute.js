@@ -10,9 +10,6 @@ router.get("/", invController.buildManagement)
 // By classification (existing)
 router.get("/type/:classificationId", invController.buildByClassificationId)
 
-// Detail (keep, if you already added earlier)
-// router.get("/detail/:invId", invController.buildVehicleDetail)
-
 // Add Classification
 router.get("/add-classification", invController.buildAddClassification)
 router.post(

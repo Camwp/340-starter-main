@@ -1,18 +1,11 @@
-const express = require("express");
-const router = new express.Router();
-const utilities = require("../utilities");
-const accountController = require("../controllers/accountController");
-const regValidate = require("../utilities/account-validation") // ← NEW
+const express = require("express")
+const router = new express.Router()
+const utilities = require("../utilities")
+const accountController = require("../controllers/accountController")
+const regValidate = require("../utilities/account-validation")
 
-router.get(
-    "/login",
-    utilities.handleErrors(accountController.buildLogin)
-);
-
-router.get(
-    "/register",
-    utilities.handleErrors(accountController.buildRegister)
-);
+router.get("/login", utilities.handleErrors(accountController.buildLogin))
+router.get("/register", utilities.handleErrors(accountController.buildRegister))
 
 router.post(
     "/register",
@@ -20,4 +13,12 @@ router.post(
     regValidate.checkRegData,
     utilities.handleErrors(accountController.registerAccount)
 )
-module.exports = router;
+
+router.post(
+    "/login",
+    regValidate.loginRules(),
+    regValidate.checkLoginData,
+    (req, res) => res.status(200).send("login process")
+)
+
+module.exports = router

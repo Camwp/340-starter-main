@@ -1,45 +1,45 @@
 const invModel = require("../models/inventory-model")
-
+const jwt = require("jsonwebtoken")
 const Util = {}
 
 
 Util.getNav = async function () {
-    const data = await invModel.getClassifications()
-    let html = '<nav class="site-nav" aria-label="Primary"><ul>'
-    html += '<li><a href="/" title="Home page">Home</a></li>'
-    data.rows.forEach((row) => {
-        html += `
+  const data = await invModel.getClassifications()
+  let html = '<nav class="site-nav" aria-label="Primary"><ul>'
+  html += '<li><a href="/" title="Home page">Home</a></li>'
+  data.rows.forEach((row) => {
+    html += `
         <li>
           <a href="/inv/type/${row.classification_id}"
              title="See our inventory of ${row.classification_name} vehicles">
             ${row.classification_name}
           </a>
         </li>`
-    })
-    html += "</ul></nav>"
-    return html
+  })
+  html += "</ul></nav>"
+  return html
 }
 
 
 Util.fmtUSD = (n) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" })
-        .format(Number(n))
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" })
+    .format(Number(n))
 
 Util.fmtInt = (n) =>
-    new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 })
-        .format(Number(n))
+  new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 })
+    .format(Number(n))
 
 
 Util.buildClassificationGrid = async function (data) {
-    let grid = ""
+  let grid = ""
 
-    if (data && data.length > 0) {
-        grid = '<ul id="inv-display" class="inv-grid" role="list">'
-        data.forEach((vehicle) => {
-            const price = Util.fmtUSD(vehicle.inv_price)
-            const title = `${vehicle.inv_make} ${vehicle.inv_model}`
-            const thumb = vehicle.inv_thumbnail || "/images/placeholder_car.jpg"
-            grid += `
+  if (data && data.length > 0) {
+    grid = '<ul id="inv-display" class="inv-grid" role="list">'
+    data.forEach((vehicle) => {
+      const price = Util.fmtUSD(vehicle.inv_price)
+      const title = `${vehicle.inv_make} ${vehicle.inv_model}`
+      const thumb = vehicle.inv_thumbnail || "/images/placeholder_car.jpg"
+      grid += `
         <li class="inv-card">
           <a href="/inv/detail/${vehicle.inv_id}"
              title="View ${title} details">
@@ -58,43 +58,43 @@ Util.buildClassificationGrid = async function (data) {
           </div>
         </li>
       `
-        })
-        grid += "</ul>"
-    } else {
-        grid = '<p class="notice">Sorry, no matching vehicles could be found.</p>'
-    }
-    return grid
+    })
+    grid += "</ul>"
+  } else {
+    grid = '<p class="notice">Sorry, no matching vehicles could be found.</p>'
+  }
+  return grid
 }
 
 
 Util.buildClassificationList = async function (classification_id = null) {
-    const data = await invModel.getClassifications() // returns { rows: [...] }
-    let classificationList =
-        '<select name="classification_id" id="classificationList" required>'
-    classificationList += "<option value=''>Choose a Classification</option>"
+  const data = await invModel.getClassifications() // returns { rows: [...] }
+  let classificationList =
+    '<select name="classification_id" id="classificationList" required>'
+  classificationList += "<option value=''>Choose a Classification</option>"
 
-    data.rows.forEach((row) => {
-        const selected =
-            classification_id != null &&
-                Number(row.classification_id) === Number(classification_id)
-                ? " selected"
-                : ""
-        classificationList += `<option value="${row.classification_id}"${selected}>${row.classification_name}</option>`
-    })
+  data.rows.forEach((row) => {
+    const selected =
+      classification_id != null &&
+        Number(row.classification_id) === Number(classification_id)
+        ? " selected"
+        : ""
+    classificationList += `<option value="${row.classification_id}"${selected}>${row.classification_name}</option>`
+  })
 
-    classificationList += "</select>"
-    return classificationList
+  classificationList += "</select>"
+  return classificationList
 }
 
 Util.handleErrors = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)
 
 Util.buildVehicleDetailHTML = function (v) {
-    const title = `${v.inv_make} ${v.inv_model} (${v.inv_year})`
-    const img = v.inv_image || v.inv_thumbnail || "/images/placeholder_car.jpg"
-    const price = Util.fmtUSD(v.inv_price)
-    const miles = Util.fmtInt(v.inv_miles)
+  const title = `${v.inv_make} ${v.inv_model} (${v.inv_year})`
+  const img = v.inv_image || v.inv_thumbnail || "/images/placeholder_car.jpg"
+  const price = Util.fmtUSD(v.inv_price)
+  const miles = Util.fmtInt(v.inv_miles)
 
-    return `
+  return `
     <section class="vehicle-detail" aria-labelledby="veh-title">
       <div class="veh-media">
         <img src="${img}" alt="${title}" loading="eager" width="900" height="600" />
@@ -119,6 +119,39 @@ Util.buildVehicleDetailHTML = function (v) {
 
 
 Util.handleErrors = (fn) => (req, res, next) =>
-    Promise.resolve(fn(req, res, next)).catch(next)
+  Promise.resolve(fn(req, res, next)).catch(next)
+
+
+/* ****************************************
+ *  Check Login
+ * ************************************ */
+// utilities/index.js
+Util.checkLogin = (req, res, next) => {
+  if (!res.locals?.loggedin) {
+    req.flash("notice", "Please log in");
+    return res.redirect("/account/login");
+  }
+  next();
+};
+
+
+/* ****************************************
+ * Middleware to check token validity
+ * *************************************** */
+Util.checkJWTToken = (req, res, next) => {
+  const token = req.cookies && req.cookies.jwt;
+  if (!token) return next();
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, accountData) => {
+    if (err) {
+      // token bad/expired -> clear cookie, but don't crash the request
+      res.clearCookie("jwt", { httpOnly: true, sameSite: "lax", path: "/" });
+      return next();
+    }
+    res.locals.accountData = accountData;
+    res.locals.loggedin = 1;
+    next();
+  });
+};
 
 module.exports = Util

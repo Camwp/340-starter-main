@@ -1,12 +1,23 @@
 <section class="container">
   <h1>Inventory Management</h1>
 
-  <% if (typeof notice !== "undefined" && notice && notice.length) { %>
-    <p class="notice"><%= notice[0] %></p>
-  <% } %>
+  <% if (typeof notice !=="undefined" && notice && notice.length) { %>
+    <p class="notice">
+      <%= notice[0] %>
+    </p>
+    <% } %>
 
-  <ul class="mgmt-links">
-    <li><a class="btn" href="/inv/add-classification">Add New Classification</a></li>
-    <li><a class="btn" href="/inv/add-inventory">Add New Vehicle</a></li>
-  </ul>
+      <ul class="mgmt-links">
+        <li><a class="btn" href="/inv/add-classification">Add New Classification</a></li>
+        <li><a class="btn" href="/inv/add-inventory">Add New Vehicle</a></li>
+        <li><a class="btn" href="/inv/classifications">Manage Classification Names</a></li>
+      </ul>
+
+
+      <p>Select a classification to see its vehicles.</p>
+
+      <div><%- classificationSelect %></div>
+
+      <table id="inventoryDisplay"></table>
 </section>
+<script src="/js/inventory.js" defer></script>

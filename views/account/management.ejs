@@ -1,0 +1,53 @@
+<main class="content">
+    <!-- Flash notice (works if you set req.flash('notice', ...) and expose it to locals) -->
+    <% if (locals.notice) { %>
+        <div class="flash notice">
+            <% if (Array.isArray(locals.notice)) { %>
+                <% locals.notice.forEach(n=> { %><p>
+                        <%= n %>
+                    </p>
+                    <% }) %>
+                        <% } else { %>
+                            <p>
+                                <%= locals.notice %>
+                            </p>
+                            <% } %>
+        </div>
+        <% } %>
+
+            <!-- Validation errors -->
+            <% if (errors && errors.length) { %>
+                <div class="errors">
+                    <ul>
+                        <% errors.forEach(e=> { %>
+                            <li>
+                                <%= e.msg || e %>
+                            </li>
+                            <% }); %>
+                    </ul>
+                </div>
+                <% } %>
+
+                    <section class="panel">
+                        <% if (locals.loggedin && account) { %>
+                            <h1>You’re logged in</h1>
+                            <p><strong>Name:</strong>
+                                <%= account.account_firstname %>
+                                    <%= account.account_lastname %>
+                            </p>
+                            <p><strong>Email:</strong>
+                                <%= account.account_email %>
+                            </p>
+
+                            <form action="/account/logout" method="post" style="margin-top:1rem;">
+                                <button type="submit">Log out</button>
+                            </form>
+                            <% } else { %>
+                                <h1>Please log in</h1>
+                                <p><a href="/account/login">Go to Login</a></p>
+                                <% } %>
+                    </section>
+
+
+
+</main>

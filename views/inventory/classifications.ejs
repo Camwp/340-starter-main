@@ -1,0 +1,50 @@
+<section class="container">
+    <h1>Manage Classifications</h1>
+
+    <% if (typeof notice !=="undefined" && notice && notice.length) { %>
+        <p class="notice">
+            <%= notice[0] %>
+        </p>
+        <% } %>
+
+            <% if (errors && errors.length) { %>
+                <div class="errors">
+                    <ul>
+                        <% errors.forEach(e=> { %><li>
+                                <%= e.msg %>
+                            </li>
+                            <% }) %>
+                    </ul>
+                </div>
+                <% } %>
+
+                    <p><a class="btn" href="/inv/add-classification">Add New Classification</a></p>
+
+                    <% if (classes && classes.length) { %>
+                        <table class="list">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th style="width:1%"></th>
+                                    <th style="width:1%"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% classes.forEach(c=> { %>
+                                    <tr>
+                                        <td>
+                                            <%= c.classification_name %>
+                                        </td>
+                                        <td><a href="/inv/edit-classification/<%= c.classification_id %>">Edit</a></td>
+                                        <td><a href="/inv/delete-classification/<%= c.classification_id %>">Delete</a>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
+                        <% } else { %>
+                            <p>No classifications found.</p>
+                            <% } %>
+
+                                <p style="margin-top:1rem;"><a href="/inv/">Back to Inventory Management</a></p>
+</section>

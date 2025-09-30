@@ -4,8 +4,22 @@ const utilities = require("../utilities")
 const accountController = require("../controllers/accountController")
 const regValidate = require("../utilities/account-validation")
 
-router.get("/login", utilities.handleErrors(accountController.buildLogin))
-router.get("/register", utilities.handleErrors(accountController.buildRegister))
+router.get(
+    "/login",
+    utilities.handleErrors(accountController.buildLogin)
+);
+
+router.post(
+    "/login",
+    regValidate.loginRules(),
+    regValidate.checkLoginData,
+    utilities.handleErrors(accountController.accountLogin)
+)
+
+router.get(
+    "/register",
+    utilities.handleErrors(accountController.buildRegister)
+);
 
 router.post(
     "/register",
@@ -14,11 +28,13 @@ router.post(
     utilities.handleErrors(accountController.registerAccount)
 )
 
-router.post(
-    "/login",
-    regValidate.loginRules(),
-    regValidate.checkLoginData,
-    (req, res) => res.status(200).send("login process")
-)
+// Default account landing (requires login)
+router.get(
+    "/",
+    regValidate.checkLoginData,                                    // <-- gate access
+    utilities.handleErrors(accountController.buildAccount)
+);
+
+router.post("/logout", utilities.handleErrors(accountController.accountLogout));
 
 module.exports = router

@@ -1,0 +1,35 @@
+<section class="container">
+    <h1>Delete Classification</h1>
+
+    <% if (typeof notice !=="undefined" && notice && notice.length) { %>
+        <p class="notice">
+            <%= notice[0] %>
+        </p>
+        <% } %>
+
+            <% if (vehicleCount> 0) { %>
+                <p>
+                    You can’t delete <strong>
+                        <%= classification.classification_name %>
+                    </strong>
+                    because it still has <strong>
+                        <%= vehicleCount %>
+                    </strong> vehicle(s).
+                    Reassign or remove those vehicles first.
+                </p>
+                <p style="margin-top:1rem;">
+                    <a href="/inv/classifications" class="btn">Back</a>
+                </p>
+                <% } else { %>
+                    <p>
+                        Are you sure you want to delete
+                        <strong>
+                            <%= classification.classification_name %>
+                        </strong>?
+                    </p>
+                    <form method="post" action="/inv/delete-classification/<%= classification.classification_id %>">
+                        <button type="submit" class="btn btn-danger">Yes, delete</button>
+                        <a href="/inv/classifications" class="btn btn-secondary">Cancel</a>
+                    </form>
+                    <% } %>
+</section>

@@ -11,6 +11,7 @@ const baseController = require("./controllers/baseController")
 const inventoryRoute = require("./routes/inventoryRoute")
 const staticRoutes = require("./routes/static")
 const utilities = require("./utilities")
+const cookieParser = require("cookie-parser")
 
 /* Swagger */
 const swaggerUi = require("swagger-ui-express")
@@ -35,6 +36,7 @@ app.set("layout", "./layouts/layout")
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
+app.use(cookieParser())
 
 /* Static assets and optional static routes */
 app.use(express.static(path.join(__dirname, "public")))
@@ -51,12 +53,14 @@ app.use(session({
   name: "sessionId",
 }))
 app.use(flash())
+app.use(utilities.checkJWTToken);   // <-- populates res.locals.loggedin + accountData
 
 
 app.use((req, res, next) => {
   res.locals.messages = expressMessages(req, res)
   next()
 })
+// after cookieParser, session, flash middleware
 
 /* Routes */
 app.get("/", utilities.handleErrors(baseController.buildHome))

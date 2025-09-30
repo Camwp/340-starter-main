@@ -38,7 +38,6 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(cookieParser())
 
-/* Static assets and optional static routes */
 app.use(express.static(path.join(__dirname, "public")))
 app.use(staticRoutes)
 
@@ -46,21 +45,22 @@ app.use(staticRoutes)
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openapi))
 
 app.use(session({
-  // store: new PgSession({ pool, createTableIfMissing: true }), 
   secret: process.env.SESSION_SECRET || "dev-secret",
   resave: true,
   saveUninitialized: true,
   name: "sessionId",
 }))
 app.use(flash())
-app.use(utilities.checkJWTToken);   // <-- populates res.locals.loggedin + accountData
+app.use(utilities.checkJWTToken);
 
 
 app.use((req, res, next) => {
   res.locals.messages = expressMessages(req, res)
-  next()
-})
-// after cookieParser, session, flash middleware
+
+  if (typeof res.locals.loggedin === "undefined") res.locals.loggedin = 0;
+  if (typeof res.locals.accountData === "undefined") res.locals.accountData = null;
+  next();
+});
 
 /* Routes */
 app.get("/", utilities.handleErrors(baseController.buildHome))
@@ -76,12 +76,11 @@ app.get("/errors/trigger", (req, res, next) => {
   next(err)
 })
 
-/* 404 (after all normal routes) */
 app.use((req, res, next) => {
   next({ status: 404, message: "Sorry, we appear to have lost that page." })
 })
 
-/* Centralized Error Handler (last) */
+
 app.use(async (err, req, res, next) => {
   const status = err.status || 500
   const nav = await utilities.getNav().catch(() => "")
@@ -107,7 +106,6 @@ app.use(async (err, req, res, next) => {
     status,
     message,
     nav,
-    // pass err only in dev if you want to show a <details>
     err: process.env.NODE_ENV !== "production" ? err : null,
   })
 })

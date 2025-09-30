@@ -21,6 +21,11 @@
                 <input type="number" id="inv_year" name="inv_year" min="1900" max="2099" required
                     value="<%= invData?.inv_year || '' %>" />
 
+                <!-- NEW: Description -->
+                <label for="inv_description">Description</label>
+                <textarea id="inv_description" name="inv_description" rows="5" required
+                    placeholder="Brief description of the vehicle"><%= invData?.inv_description || '' %></textarea>
+
                 <label for="inv_price">Price (USD)</label>
                 <input type="number" id="inv_price" name="inv_price" min="0" step="0.01" required
                     value="<%= invData?.inv_price || '' %>" />

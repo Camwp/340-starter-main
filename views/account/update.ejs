@@ -1,0 +1,58 @@
+<section class="container">
+    <h1>
+        <%= title %>
+    </h1>
+
+    <% if (notice && notice.length) { %>
+        <p class="notice">
+            <%= notice[0] %>
+        </p>
+        <% } %>
+
+            <% if (errors && errors.length) { %>
+                <div class="errors">
+                    <ul>
+                        <% errors.forEach(e=> { %><li>
+                                <%= e.msg %>
+                            </li>
+                            <% }) %>
+                    </ul>
+                </div>
+                <% } %>
+
+                    <form method="post" action="/account/update/<%= account.account_id %>" novalidate>
+                        <input type="hidden" name="account_id" value="<%= account.account_id %>">
+
+                        <label for="account_firstname">First name</label>
+                        <input id="account_firstname" name="account_firstname" required
+                            value="<%= account.account_firstname %>">
+
+                        <label for="account_lastname">Last name</label>
+                        <input id="account_lastname" name="account_lastname" required
+                            value="<%= account.account_lastname %>">
+
+                        <label for="account_email">Email</label>
+                        <input id="account_email" name="account_email" type="email" required
+                            value="<%= account.account_email %>">
+
+                        <div style="margin-top:1rem">
+                            <button type="submit" class="btn">Update Account</button>
+                        </div>
+                    </form>
+
+                    <hr>
+
+                    <form method="post" action="/account/update-password" novalidate>
+                        <input type="hidden" name="account_id" value="<%= account.account_id %>">
+
+                        <p>Your new password must be at least 12 characters and include upper, lower, number, and
+                            symbol.</p>
+
+                        <label for="account_password">New password</label>
+                        <input id="account_password" name="account_password" type="password" required>
+
+                        <div style="margin-top:1rem">
+                            <button type="submit" class="btn">Change Password</button>
+                        </div>
+                    </form>
+</section>

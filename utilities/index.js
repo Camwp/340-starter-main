@@ -68,7 +68,7 @@ Util.buildClassificationGrid = async function (data) {
 
 
 Util.buildClassificationList = async function (classification_id = null) {
-  const data = await invModel.getClassifications() // returns { rows: [...] }
+  const data = await invModel.getClassifications()
   let classificationList =
     '<select name="classification_id" id="classificationList" required>'
   classificationList += "<option value=''>Choose a Classification</option>"
@@ -122,10 +122,7 @@ Util.handleErrors = (fn) => (req, res, next) =>
   Promise.resolve(fn(req, res, next)).catch(next)
 
 
-/* ****************************************
- *  Check Login
- * ************************************ */
-// utilities/index.js
+
 Util.checkLogin = (req, res, next) => {
   if (!res.locals?.loggedin) {
     req.flash("notice", "Please log in");
@@ -135,16 +132,12 @@ Util.checkLogin = (req, res, next) => {
 };
 
 
-/* ****************************************
- * Middleware to check token validity
- * *************************************** */
 Util.checkJWTToken = (req, res, next) => {
   const token = req.cookies && req.cookies.jwt;
   if (!token) return next();
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, accountData) => {
     if (err) {
-      // token bad/expired -> clear cookie, but don't crash the request
       res.clearCookie("jwt", { httpOnly: true, sameSite: "lax", path: "/" });
       return next();
     }

@@ -4,19 +4,20 @@ const utilities = require("../utilities");
 
 const invCont = {};
 
-/* ===== Management (main screen) ===== */
 invCont.buildManagement = utilities.handleErrors(async (req, res) => {
     const nav = await utilities.getNav();
     const classificationSelect = await utilities.buildClassificationList();
+    const account = res.locals.accountData || null;
+
     res.render("./inventory/management", {
         title: "Inventory Management",
         nav,
         classificationSelect,
         errors: null,
+        account,
     });
 });
 
-/* ===== AJAX: Inventory by classification (JSON) ===== */
 invCont.getInventoryJSON = utilities.handleErrors(async (req, res) => {
     const classification_id = parseInt(req.params.classification_id, 10);
     if (!Number.isInteger(classification_id)) {
@@ -27,7 +28,6 @@ invCont.getInventoryJSON = utilities.handleErrors(async (req, res) => {
     const err = new Error("No data returned"); err.status = 404; throw err;
 });
 
-/* ===== Add Classification ===== */
 invCont.buildAddClassification = utilities.handleErrors(async (req, res) => {
     const nav = await utilities.getNav();
     res.render("./inventory/add-classification", {
@@ -58,7 +58,6 @@ invCont.addClassification = utilities.handleErrors(async (req, res) => {
     });
 });
 
-/* ===== Add Inventory ===== */
 invCont.buildAddInventory = utilities.handleErrors(async (req, res) => {
     const nav = await utilities.getNav();
     const classificationList = await utilities.buildClassificationList();
@@ -84,11 +83,7 @@ invCont.addInventory = utilities.handleErrors(async (req, res) => {
 
     if (inserted) {
         req.flash("notice", "Vehicle added successfully.");
-        const nav = await utilities.getNav();
-        return res.status(201).render("./inventory/management", {
-            title: "Inventory Management",
-            nav,
-        });
+        return res.redirect("/inv/");
     }
 
     const nav = await utilities.getNav();
@@ -102,7 +97,6 @@ invCont.addInventory = utilities.handleErrors(async (req, res) => {
     });
 });
 
-/* ===== Public: Browse by classification ===== */
 invCont.buildByClassificationId = utilities.handleErrors(async (req, res) => {
     const classification_id = Number(req.params.classificationId);
     if (!Number.isInteger(classification_id) || classification_id <= 0) {
@@ -122,7 +116,6 @@ invCont.buildByClassificationId = utilities.handleErrors(async (req, res) => {
     });
 });
 
-/* ===== Public: Vehicle detail ===== */
 invCont.buildVehicleDetail = utilities.handleErrors(async (req, res) => {
     const invId = Number(req.params.invId);
     if (!Number.isInteger(invId) || invId <= 0) {
@@ -138,15 +131,10 @@ invCont.buildVehicleDetail = utilities.handleErrors(async (req, res) => {
     res.status(200).render("./inventory/detail", { title, nav, content });
 });
 
-/* =======================================================================
-   Classification name management: list / edit / delete
-   (You’ll need model helpers: getClassificationById, updateClassificationName, deleteClassification)
-   ======================================================================= */
 
-// List all classifications with actions
 invCont.buildClassificationsAdmin = utilities.handleErrors(async (req, res) => {
     const nav = await utilities.getNav();
-    const data = await invModel.getClassifications(); // usually returns { rows: [...] }
+    const data = await invModel.getClassifications();
     const classes = Array.isArray(data) ? data : data.rows;
     res.render("./inventory/classifications", {
         title: "Manage Classifications",
@@ -156,7 +144,6 @@ invCont.buildClassificationsAdmin = utilities.handleErrors(async (req, res) => {
     });
 });
 
-// Edit form
 invCont.buildEditClassification = utilities.handleErrors(async (req, res) => {
     const nav = await utilities.getNav();
     const id = parseInt(req.params.classificationId, 10);
@@ -171,7 +158,7 @@ invCont.buildEditClassification = utilities.handleErrors(async (req, res) => {
     });
 });
 
-// Edit submit
+
 invCont.updateClassification = utilities.handleErrors(async (req, res) => {
     const id = parseInt(req.params.classificationId, 10);
     const { classification_name } = req.body;
@@ -193,7 +180,7 @@ invCont.updateClassification = utilities.handleErrors(async (req, res) => {
     });
 });
 
-// Delete confirm
+
 invCont.buildDeleteClassification = utilities.handleErrors(async (req, res) => {
     const nav = await utilities.getNav();
     const id = parseInt(req.params.classificationId, 10);
@@ -210,12 +197,12 @@ invCont.buildDeleteClassification = utilities.handleErrors(async (req, res) => {
     });
 });
 
-// Delete submit
+
 invCont.deleteClassification = utilities.handleErrors(async (req, res) => {
     const id = parseInt(req.params.classificationId, 10);
     if (!Number.isInteger(id)) { const e = new Error("Invalid id"); e.status = 400; throw e; }
 
-    // safety: prevent delete if vehicles exist
+
     const vehicles = await invModel.getInventoryByClassificationId(id);
     if (vehicles.length > 0) {
         req.flash("notice", "Cannot delete: this classification still has vehicles. Reassign or remove them first.");
@@ -226,5 +213,90 @@ invCont.deleteClassification = utilities.handleErrors(async (req, res) => {
     req.flash("notice", deleted ? "Classification deleted." : "Delete failed.");
     res.redirect("/inv/classifications");
 });
+
+invCont.buildEditInventory = utilities.handleErrors(async (req, res) => {
+    const invId = Number(req.params.invId);
+    if (!Number.isInteger(invId) || invId <= 0) {
+        const err = new Error("Invalid vehicle id"); err.status = 400; throw err;
+    }
+    const vehicle = await invModel.getInventoryById(invId);
+    if (!vehicle) {
+        const err = new Error("Vehicle not found"); err.status = 404; throw err;
+    }
+
+    const nav = await utilities.getNav();
+    const classificationList = await utilities.buildClassificationList(vehicle.classification_id);
+
+    res.render("./inventory/edit-inventory", {
+        title: `Edit ${vehicle.inv_make} ${vehicle.inv_model}`,
+        nav,
+        classificationList,
+        errors: null,
+        invData: vehicle,
+    });
+});
+
+invCont.updateInventory = utilities.handleErrors(async (req, res) => {
+    const inv_id = Number(req.params.invId);
+    const {
+        inv_make, inv_model, inv_year, inv_description,
+        inv_image, inv_thumbnail, inv_price, inv_miles, classification_id,
+    } = req.body;
+
+    const updated = await invModel.updateInventory({
+        inv_id,
+        inv_make,
+        inv_model,
+        inv_year,
+        inv_description,
+        inv_image,
+        inv_thumbnail,
+        inv_price,
+        inv_miles,
+        classification_id,
+    });
+
+    if (updated) {
+        req.flash("notice", "Vehicle updated successfully.");
+        return res.redirect("/inv/");
+    }
+
+    const nav = await utilities.getNav();
+    const classificationList = await utilities.buildClassificationList(classification_id);
+    res.status(400).render("./inventory/edit-inventory", {
+        title: `Edit ${inv_make} ${inv_model}`,
+        nav,
+        classificationList,
+        errors: [{ msg: "Update failed. Check values and try again." }],
+        invData: { inv_id, ...req.body },
+    });
+});
+
+invCont.buildDeleteInventory = utilities.handleErrors(async (req, res) => {
+    const invId = Number(req.params.invId);
+    if (!Number.isInteger(invId) || invId <= 0) {
+        const err = new Error("Invalid vehicle id"); err.status = 400; throw err;
+    }
+    const vehicle = await invModel.getInventoryById(invId);
+    if (!vehicle) {
+        const err = new Error("Vehicle not found"); err.status = 404; throw err;
+    }
+
+    const nav = await utilities.getNav();
+    res.render("./inventory/delete-inventory", {
+        title: `Delete ${vehicle.inv_make} ${vehicle.inv_model}`,
+        nav,
+        errors: null,
+        invData: vehicle,
+    });
+});
+
+invCont.deleteInventory = utilities.handleErrors(async (req, res) => {
+    const invId = Number(req.params.invId);
+    const deleted = await invModel.deleteInventory(invId);
+    req.flash("notice", deleted ? "Vehicle deleted." : "Delete failed.");
+    res.redirect("/inv/");
+});
+
 
 module.exports = invCont;

@@ -86,9 +86,9 @@ async function addInventory(v) {
   const sql = `
     INSERT INTO public.inventory
       (inv_make, inv_model, inv_year, inv_description,
-       inv_image, inv_thumbnail, inv_price, inv_miles, classification_id)
+       inv_image, inv_thumbnail, inv_price, inv_miles, inv_color, classification_id)
     VALUES
-      ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+      ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
     RETURNING inv_id;
   `;
   const params = [
@@ -100,11 +100,64 @@ async function addInventory(v) {
     v.inv_thumbnail,
     Number(v.inv_price),
     Number(v.inv_miles),
+    String(v.inv_color),
     Number(v.classification_id),
   ];
   const { rows } = await pool.query(sql, params);
   return rows[0] || null;
 }
+
+async function getInventoryById(inv_id) {
+  const q = `
+    SELECT inv_id, inv_make, inv_model, inv_year, inv_price, inv_miles,
+           inv_description, inv_image, inv_thumbnail, inv_color, classification_id
+      FROM public.inventory
+     WHERE inv_id = $1
+     LIMIT 1
+  `;
+  const { rows } = await pool.query(q, [inv_id]);
+  return rows[0] || null;
+}
+
+async function updateInventory(v) {
+  const sql = `
+    UPDATE public.inventory
+       SET inv_make = $1,
+           inv_model = $2,
+           inv_year = $3,
+           inv_description = $4,
+           inv_image = $5,
+           inv_thumbnail = $6,
+           inv_price = $7,
+           inv_miles = $8,
+           classification_id = $9
+     WHERE inv_id = $10
+     RETURNING inv_id;
+  `;
+  const params = [
+    v.inv_make,
+    v.inv_model,
+    Number(v.inv_year),
+    v.inv_description,
+    v.inv_image,
+    v.inv_thumbnail,
+    Number(v.inv_price),
+    Number(v.inv_miles),
+    Number(v.classification_id),
+    Number(v.inv_id),
+  ];
+  const { rows } = await pool.query(sql, params);
+  return rows[0] || null;
+}
+
+async function deleteInventory(inv_id) {
+  const { rowCount } = await pool.query(
+    "DELETE FROM public.inventory WHERE inv_id = $1",
+    [Number(inv_id)]
+  );
+  return rowCount;
+}
+
 
 async function getInventoryById(inv_id) {
   const q = `
@@ -125,10 +178,10 @@ module.exports = {
   addClassification,
   updateClassificationName,
   deleteClassification,
-  getInventoryCountByClassificationId, // optional, but handy
-
-  // inventory
+  getInventoryCountByClassificationId,
   getInventoryByClassificationId,
   addInventory,
   getInventoryById,
+  updateInventory,
+  deleteInventory,
 };

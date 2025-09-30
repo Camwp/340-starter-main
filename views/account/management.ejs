@@ -1,5 +1,4 @@
 <main class="content">
-    <!-- Flash notice (works if you set req.flash('notice', ...) and expose it to locals) -->
     <% if (locals.notice) { %>
         <div class="flash notice">
             <% if (Array.isArray(locals.notice)) { %>
@@ -15,7 +14,6 @@
         </div>
         <% } %>
 
-            <!-- Validation errors -->
             <% if (errors && errors.length) { %>
                 <div class="errors">
                     <ul>
@@ -29,23 +27,40 @@
                 <% } %>
 
                     <section class="panel">
+                        <h1>You’re logged in</h1>
+                        <p><strong>Name:</strong>
+                            <%= account.account_firstname %>
+                                <%= account.account_lastname %>
+                        </p>
+                        <p><strong>Email:</strong>
+                            <%= account.account_email %>
+                        </p>
+
+
+
+                    </section>
+                    <section class="panel">
                         <% if (locals.loggedin && account) { %>
-                            <h1>You’re logged in</h1>
-                            <p><strong>Name:</strong>
-                                <%= account.account_firstname %>
-                                    <%= account.account_lastname %>
-                            </p>
-                            <p><strong>Email:</strong>
-                                <%= account.account_email %>
+
+
+                            <p>
+                                <a class="btn" href="/account/update/<%= account.account_id %>">Update account
+                                    information</a>
                             </p>
 
-                            <form action="/account/logout" method="post" style="margin-top:1rem;">
-                                <button type="submit">Log out</button>
-                            </form>
-                            <% } else { %>
-                                <h1>Please log in</h1>
-                                <p><a href="/account/login">Go to Login</a></p>
+                            <% if (account.account_type==='Employee' || account.account_type==='Admin' ) { %>
+                                <h3>Inventory Management</h3>
+                                <p><a class="btn" href="/inv/">Go to Inventory Management</a></p>
                                 <% } %>
+
+                                    <form action="/account/logout" method="post" style="margin-top:1rem;">
+                                        <button type="submit" class="btn btn-secondary">Log out</button>
+                                    </form>
+
+                                    <% } else { %>
+                                        <h1>Please log in</h1>
+                                        <p><a class="btn" href="/account/login">Go to Login</a></p>
+                                        <% } %>
                     </section>
 
 

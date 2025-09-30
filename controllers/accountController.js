@@ -5,25 +5,16 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const bcrypt = require("bcryptjs");
 
-/* ****************************************
-*  Deliver login view
-* *************************************** */
 async function buildLogin(req, res) {
     const nav = await utilities.getNav();
     res.render("account/login", { title: "Login", nav, errors: null });
 }
 
-/* ****************************************
-*  Deliver registration view
-* *************************************** */
 async function buildRegister(req, res) {
     const nav = await utilities.getNav();
     res.render("account/register", { title: "Register", nav, errors: null });
 }
 
-/* ****************************************
-*  Process Registration
-* *************************************** */
 async function registerAccount(req, res) {
     const nav = await utilities.getNav();
     const { account_firstname, account_lastname, account_email, account_password } = req.body;
@@ -46,15 +37,13 @@ async function registerAccount(req, res) {
 
     if (regResult && regResult.rows && regResult.rows.length) {
         req.flash("notice", `Congratulations, you're registered ${account_firstname}. Please log in.`);
-        return res.redirect("/account/login"); // PRG so flash shows
+        return res.redirect("/account/login");
     }
     req.flash("notice", "Sorry, the registration failed.");
     return res.status(501).render("account/register", { title: "Registration", nav, errors: null });
 }
 
-/* ****************************************
- *  Process login request
- * ************************************ */
+
 async function accountLogin(req, res) {
     const nav = await utilities.getNav();
     const { account_email, account_password } = req.body;
@@ -75,7 +64,6 @@ async function accountLogin(req, res) {
         if (ok) {
             delete accountData.account_password;
 
-            // IMPORTANT: jsonwebtoken expects seconds or a string, not ms
             const accessToken = jwt.sign(accountData, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
 
             const cookieOpts = { httpOnly: true, maxAge: 3600 * 1000 };
@@ -85,8 +73,7 @@ async function accountLogin(req, res) {
             return res.redirect("/account/");
         }
 
-        // Wrong password path
-        req.flash("notice", "Please check your credentials and try again."); // fixed flash key
+        req.flash("notice", "Please check your credentials and try again.");
         return res.status(400).render("account/login", {
             title: "Login",
             nav,
@@ -94,17 +81,14 @@ async function accountLogin(req, res) {
             account_email,
         });
     } catch (error) {
-        // will be caught by your global error handler
         throw new Error("Access Forbidden");
     }
 }
 
-/* ****************************************
-*  Deliver Account Management view
-* *************************************** */
+
 async function buildAccount(req, res) {
     const nav = await utilities.getNav();
-    const account = res.locals.accountData || null; // set by checkJWTToken
+    const account = res.locals.accountData || null;
     return res.render("account/management", {
         title: "Account Management",
         nav,
@@ -118,15 +102,14 @@ async function accountLogout(req, res) {
     const cookieOpts = { httpOnly: true };
     if (process.env.NODE_ENV !== "development") cookieOpts.secure = true;
 
-    res.clearCookie("jwt", cookieOpts); // clear auth cookie
+    res.clearCookie("jwt", cookieOpts);
 
-    // Regenerate to get a fresh, empty session we can flash into
+
     if (req.session) {
         req.session.regenerate(err => {
             if (err) return next(err);
             req.flash("notice", "You have been logged out.");
-            // If you changed the session cookie name, clear it explicitly if desired:
-            // res.clearCookie("sessionId"); // you set name: "sessionId" in express-session
+            res.clearCookie("sessionId");
             return res.redirect("/account/login");
         });
     } else {
@@ -136,11 +119,72 @@ async function accountLogout(req, res) {
 
 
 
+async function buildUpdate(req, res) {
+    const nav = await utilities.getNav();
+    const id = Number(req.params.accountId);
+    const account = await accountModel.getAccountById(id);
+    if (!account) { const e = new Error("Account not found"); e.status = 404; throw e; }
+    res.render("account/update", {
+        title: "Update Account",
+        nav,
+        account,
+        errors: null,
+        notice: req.flash("notice"),
+    });
+}
+
+async function updateAccount(req, res) {
+    const nav = await utilities.getNav();
+    const { account_id, account_firstname, account_lastname, account_email } = req.body;
+
+    if (await accountModel.emailTakenByAnother(account_email, account_id)) {
+        return res.status(400).render("account/update", {
+            title: "Update Account",
+            nav,
+            errors: [{ msg: "That email is already in use." }],
+            account: req.body,
+            notice: req.flash("notice"),
+        });
+    }
+
+    const ok = await accountModel.updateAccount({ account_id, account_firstname, account_lastname, account_email });
+    req.flash("notice", ok ? "Account updated." : "Update failed.");
+    const updated = await accountModel.getAccountById(account_id);
+    return res.render("account/management", {
+        title: "Account Management",
+        nav,
+        errors: null,
+        account: updated,
+        notice: req.flash("notice"),
+    });
+}
+
+async function changePassword(req, res) {
+    const nav = await utilities.getNav();
+    const { account_id, account_password } = req.body;
+
+    const hash = bcrypt.hashSync(account_password, 10);
+    const ok = await accountModel.updatePassword({ account_id, account_password: hash });
+    req.flash("notice", ok ? "Password changed." : "Password change failed.");
+    const account = await accountModel.getAccountById(account_id);
+    return res.render("account/management", {
+        title: "Account Management",
+        nav,
+        errors: null,
+        account,
+        notice: req.flash("notice"),
+    });
+}
+
+
 module.exports = {
     buildLogin,
     buildRegister,
     registerAccount,
     accountLogin,
-    buildAccount,           // <-- export it
+    buildAccount,
     accountLogout,
+    changePassword,
+    updateAccount,
+    buildUpdate,
 };

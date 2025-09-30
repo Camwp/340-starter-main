@@ -28,12 +28,32 @@ router.post(
     utilities.handleErrors(accountController.registerAccount)
 )
 
-// Default account landing (requires login)
 router.get(
     "/",
-    regValidate.checkLoginData,                                    // <-- gate access
+    regValidate.checkLoginData,
     utilities.handleErrors(accountController.buildAccount)
 );
+
+router.get("/update/:accountId",
+    utilities.checkLogin,
+    utilities.handleErrors(accountController.buildUpdate)
+);
+
+router.post("/update/:accountId",
+    utilities.checkLogin,
+    regValidate.updateAccountRules(),
+    regValidate.checkUpdateAccountData,
+    utilities.handleErrors(accountController.updateAccount)
+);
+
+router.post("/update-password",
+    utilities.checkLogin,
+    regValidate.passwordChangeRules(),
+    regValidate.checkPasswordChangeData,
+    utilities.handleErrors(accountController.changePassword)
+);
+
+
 
 router.post("/logout", utilities.handleErrors(accountController.accountLogout));
 

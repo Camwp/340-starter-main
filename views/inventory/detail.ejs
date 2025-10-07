@@ -5,3 +5,22 @@
 
     <%- content %>
 </section>
+<section class="panel" style="margin-top:1rem">
+    <p>Saved by <strong>
+            <%= favCount %>
+        </strong> user<%= favCount===1 ? "" : "s" %>.</p>
+
+    <% if (account) { %>
+        <% if (isFav) { %>
+            <form action="/account/favorites/<%= vehicle.inv_id %>/delete" method="post">
+                <button class="btn btn-secondary" type="submit">Remove from My Garage</button>
+            </form>
+            <% } else { %>
+                <form action="/account/favorites/<%= vehicle.inv_id %>" method="post">
+                    <button class="btn" type="submit">Save to My Garage</button>
+                </form>
+                <% } %>
+                    <% } else { %>
+                        <p><a class="btn" href="/account/login">Log in to save this vehicle</a></p>
+                        <% } %>
+</section>

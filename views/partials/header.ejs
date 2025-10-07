@@ -3,7 +3,11 @@
     <a href="/">Home</a>
 
     <% if (loggedin && accountData) { %>
-        <a class="account" href="/account/">Welcome <%= accountData.account_firstname %></a>
+
+        <a href="/account/garage">My Garage</a>
+
+
+        <a class="account" href="/account/">Welcome <%= accountData.account_firstname %></a> </p>
 
         <form action="/account/logout" method="post" style="display:inline">
             <button type="submit" class="linklike">Logout</button>

@@ -2,6 +2,8 @@ const express = require("express")
 const router = new express.Router()
 const utilities = require("../utilities")
 const accountController = require("../controllers/accountController")
+const favoriteController = require("../controllers/favoriteController")
+
 const regValidate = require("../utilities/account-validation")
 
 router.get(
@@ -53,7 +55,11 @@ router.post("/update-password",
     utilities.handleErrors(accountController.changePassword)
 );
 
+router.get("/garage", utilities.checkLogin, favoriteController.buildGarage);
 
+// Add / remove a favorite
+router.post("/favorites/:invId", utilities.checkLogin, favoriteController.add);
+router.post("/favorites/:invId/delete", utilities.checkLogin, favoriteController.remove);
 
 router.post("/logout", utilities.handleErrors(accountController.accountLogout));
 

@@ -1,0 +1,48 @@
+<section class="container">
+    <h1>My Garage</h1>
+
+    <% if (notice && notice.length) { %>
+        <p class="notice">
+            <%= notice[0] %>
+        </p>
+        <% } %>
+
+            <% if (!items || !items.length) { %>
+                <p class="muted">You haven’t saved any vehicles yet.</p>
+                <p><a class="btn" href="/">Browse inventory</a></p>
+                <% } else { %>
+                    <table class="list">
+                        <thead>
+                            <tr>
+                                <th>Vehicle</th>
+                                <th>Year</th>
+                                <th>Price</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% items.forEach(v=> { %>
+                                <tr>
+                                    <td>
+                                        <a href="/inv/detail/<%= v.inv_id %>">
+                                            <%= v.inv_make %>
+                                                <%= v.inv_model %>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <%= v.inv_year %>
+                                    </td>
+                                    <td>
+                                        <%= utilities.fmtUSD(v.inv_price) %>
+                                    </td>
+                                    <td>
+                                        <form action="/account/favorites/<%= v.inv_id %>/delete" method="post">
+                                            <button class="btn btn-danger" type="submit">Remove</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                    <% } %>
+</section>

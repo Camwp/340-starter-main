@@ -1,5 +1,7 @@
 // controllers/invController.js
 const invModel = require("../models/inventory-model");
+const favoriteModel = require("../models/favorite-model");
+
 const utilities = require("../utilities");
 
 const invCont = {};
@@ -121,15 +123,37 @@ invCont.buildVehicleDetail = utilities.handleErrors(async (req, res) => {
     if (!Number.isInteger(invId) || invId <= 0) {
         const err = new Error("Invalid vehicle id"); err.status = 400; throw err;
     }
+
     const vehicle = await invModel.getInventoryById(invId);
     if (!vehicle) {
         const err = new Error("Vehicle not found"); err.status = 404; throw err;
     }
+
     const nav = await utilities.getNav();
+    const account = res.locals.accountData || null;
+
+    // Favorites state
+    let isFav = false;
+    if (account) {
+        isFav = await favoriteModel.isFavorite(account.account_id, invId);
+    }
+    const favCount = await favoriteModel.countForVehicle(invId);
+
     const content = utilities.buildVehicleDetailHTML(vehicle);
     const title = `${vehicle.inv_make} ${vehicle.inv_model} (${vehicle.inv_year})`;
-    res.status(200).render("./inventory/detail", { title, nav, content });
+
+    res.status(200).render("./inventory/detail", {
+        title,
+        nav,
+        content,
+        vehicle,         // for the favorites UI
+        account,         // logged-in user (or null)
+        isFav,           // whether this user saved it
+        favCount,        // how many users saved it
+        notice: req.flash("notice"),
+    });
 });
+
 
 
 invCont.buildClassificationsAdmin = utilities.handleErrors(async (req, res) => {

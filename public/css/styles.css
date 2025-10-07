@@ -474,3 +474,113 @@ main {
 .error-view,
 .vehicle-detail,
 #inv-display.inv-grid {}
+
+/* Optional container polish */
+.container h1 {
+  margin: 0 0 .75rem 0;
+  line-height: 1.25;
+}
+
+/* Garage table */
+table.list {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: .5rem;
+  overflow: hidden;
+  /* keeps rounded corners on the header row */
+}
+
+table.list thead th {
+  text-align: left;
+  font-weight: 600;
+  padding: .75rem .9rem;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+table.list tbody td {
+  padding: .75rem .9rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+table.list tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+table.list tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* Vehicle link emphasis */
+table.list td:first-child a {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+table.list td:first-child a:hover {
+  text-decoration: underline;
+}
+
+/* Action buttons inside table */
+table.list td form {
+  display: inline;
+}
+
+table.list td .btn {
+  display: inline-block;
+  padding: .45rem .75rem;
+  border-radius: .5rem;
+  text-decoration: none;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  line-height: 1;
+  cursor: pointer;
+}
+
+table.list td .btn:hover {
+  background: #f3f4f6;
+}
+
+table.list td .btn-danger {
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+table.list td .btn-danger:hover {
+  background: #fecaca;
+}
+
+/* If you show thumbnails in the future */
+table.list td img {
+  display: block;
+  width: 64px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: .375rem;
+  border: 1px solid #e5e7eb;
+}
+
+/* Small screens: make table scroll instead of breaking layout */
+@media (max-width: 640px) {
+  table.list {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table.list th,
+  table.list td {
+    white-space: nowrap;
+  }
+
+  .container h1 {
+    font-size: 1.25rem;
+  }
+}
